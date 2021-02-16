@@ -1,0 +1,157 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Feb 14 23:41:23 2021
+
+@author: chris
+"""
+
+import docx2txt
+from termcolor import colored
+import tkinter
+from tkinter import filedialog
+from nltk.util import everygrams
+import pprint
+import pandas as pd
+import string
+import itertools
+import re
+from re import search
+
+try:
+    from IPython import get_ipython
+    get_ipython().magic('clear')
+except:
+    pass
+
+pp = pprint.PrettyPrinter(indent=4)
+
+# root = tkinter.Tk()
+# root.wm_withdraw() # this completely hides the root window
+# file = filedialog.askopenfilename()
+
+file = r"C:\Users\chris\Documents\Transgola\Clients\PROJECTS\2021\382200121_TM_HS\Translation\MYCOPY_HLA.P1649_TdR-EIA-Linha de Transmiss__o Lubango - Namibe_JICA_20210120 EN.docx"
+
+text = docx2txt.process(file)
+# print(text)
+
+paras = text.split('\n')
+
+paras = [x for x in paras if x]
+
+
+allNgrams = []
+
+for p in paras:
+    p_split = p.split()
+    allNgrams.append(list(everygrams(p_split)))
+    
+    
+# for grams in allNgrams:
+#     print(grams) 
+#     print('\n')
+#     print('\n')
+
+allNgramsList = []
+
+for phrase in allNgrams:
+    for gram in phrase:
+        allNgramsList.append(list(gram))
+        
+
+allNgramsStrings = ([' '.join(e).lower() for e in allNgramsList])
+
+
+gramsDict = {}
+for gram in allNgramsStrings:
+    count = allNgramsStrings.count(gram)
+    gramsDict[gram] = count
+      
+# store the counts (the keys of the new dict) as a set (keeps elements unique)
+counts = set(gramsDict.values()) 
+
+# use a list comprehension, iterating through keys and checking the values match each n
+countDic = {}
+countDic = {n:[k for k in gramsDict.keys() if gramsDict[k] == n] for n in set(gramsDict.values())}
+countDic.pop(1, None)  
+
+
+gramsLiist = []
+counts = []
+
+for k, v in countDic.items():    
+    gramsLiist.append(v)
+
+
+gramsLiist1 = []
+for gram in gramsLiist:
+    for s in gram:
+        gramsLiist1.append(s)
+
+gramsLiist1 = sorted(gramsLiist1, key=len, reverse=True)
+print(f'there are {len(gramsLiist1)} duplicate nGrams in your file')
+
+
+
+
+
+
+# colores= [ 'red', 'blue']
+
+# print('\n')
+# print(colored(gramsLiist1[n], 'green'))
+# print('\n')
+
+# longest_string = max(gramsLiist2, key=len)
+
+# print(max(gramsLiist1, key=len))
+
+n =0
+
+# c = ['blue', 'blue', 'green']
+
+while n <= len(gramsLiist1) -1:
+    new_text = text.lower().replace(gramsLiist1[n], colored(gramsLiist1[n], 'red', attrs=['bold']))
+    n += 1
+    print(new_text)
+    
+
+# new_text = text.lower().replace(gramsLiist1[n], colored(gramsLiist1[n],'red', attrs=['bold']))
+
+
+# # remove consecutive blank lines
+# new_text1 = []
+# for x in new_text:
+#     xn = re.sub(r'\n\s*\n', '\n\n', x)
+#     formattedText.append(xn)
+
+# print(new_text)
+
+
+
+
+
+
+# formattedText1 = []
+# for t in text.lower().split(' '):
+#     if t in gramsLiist1[n]:
+#         formattedText1.append(colored(t,'red', attrs=['bold'])) 
+#     else: 
+#         formattedText1.append(t)
+
+
+# max(gramsLiist1, key=len)
+# remove consecutive blank lines
+# formattedText2 = []
+# for x in new_text:
+
+#     xn = re.sub(r'\n\s*\n', '\n\n', x)
+#     formattedText2.append(xn)
+
+# print(" ".join(formattedText2))
+
+
+# df = pd.DataFrame(list(gramsDict.items()),columns = ['Grams','Count'])
+# df['String_Lengths'] = df['Grams'].str.len()
+# df.sort_values((['String_Lengths']),ascending=False )
+# print(df)
+# df.to_excel('nGrams.xlsx')
